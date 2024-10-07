@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+{% block body %}
+
+  <!-- Page Header -->
+  <header class="masthead mb-0" style="background-image: url('{{url_for('static',filename='img/Request_Page.jpg')}}')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>Your Requests</h1>
+            <h2 class="subheading">HOSTEL</h2>
+            <span class="meta"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  {% with messages=get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <!-- Modal for Chart -->
+  <div class="modal fade" id="chartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Chart</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Chart Container -->
+          <canvas id="issueFrequencyChart" style="width: 100%; height: 100%;"></canvas>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Content -->
+  <div class="container">
+      <!-- Button to open modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#chartModal" style="margin: 10px; float: right;">
+      View Chart
+    </button> 
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>R_ID</th>
+          <th>Service Needed</th>
+          <th>Issue</th>
+          <th>Special Request</th>
+          <th>Ordered By</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+        <tr>
+          <td>{{post.id}}</td>
+          <td>{{post.medicines}}</td>
+          <td>{{post.disease}}</td>
+          <td>{{post.amount}}</td>
+          <td>{{post.utype}}: {{post.username}}</td>
+          <td><a href="/deletemp/{{post.id}}"><button onclick="return confirm('Are you sure to Delete data');" class="btn btn-danger">Delete</button></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // Step 1: Count occurrences of each issue
+    var issueCounts = {};
+    {% for post in posts %}
+      var issue = "{{ post.disease }}";
+      if(issue in issueCounts) {
+        issueCounts[issue]++;
+      } else {
+        issueCounts[issue] = 1;
+      }
+    {% endfor %}
+
+    // Step 2: Prepare data for the chart
+    var issues = Object.keys(issueCounts);  // x-axis labels (Issues)
+    var counts = Object.values(issueCounts);  // y-axis data (Number of times each issue occurred)
+
+    // Step 3: Create the Chart.js chart
+    var ctx = document.getElementById('issueFrequencyChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: issues,  // Set the issue labels for the x-axis
+        datasets: [{
+          label: 'Number of Times Issue Occurred',
+          data: counts,  // Set the counts for the y-axis
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Issue'  // X-axis label
+            }
+          }],
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: 'Number of Times Occurred'  // Y-axis label
+            },
+            ticks: {
+              beginAtZero: true  // Ensure y-axis starts at 0
+            }
+          }]
+        },
+        tooltips: {
+          enabled: true,
+          mode: 'index',
+          intersect: false
+        }
+      }
+    });
+  </script>
+
+  <!-- Custom scripts for this template -->
+  <script src="js/clean-blog.min.js"></script>
+
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block body %}
+
+  <!-- Page Header -->
+  <header class="masthead mb-0" style="background-image: url('{{url_for('static',filename='img/profile-bg.jpg')}}')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+            <h1>Profile</h1>
+            <span class="subheading">Welcome, {{ user.username }}!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  {% with messages=get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+
+  <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <!-- Profile Information -->
+  <div class="container">
+    <h2><span class="badge badge-warning">Student Profile</span></h2>
+    <div class="profile-info">
+      <p><strong>Username:</strong> {{ user.username }}</p>
+      <p><strong>USN:</strong> {{ user.usn }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Date of Birth:</strong> {{ user.date_of_birth if user.date_of_birth else 'Not provided' }}</p>
+      <p><strong>Guardian's Name:</strong> {{ user.guardians_name if user.guardians_name else 'Not provided' }}</p>
+      <p><strong>Phone Number:</strong> {{ user.phone_number if user.phone_number else 'Not provided' }}</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions mt-4">
+      <a href="/logout" class="btn btn-primary">Logout</a>
+      <a href="/list" class="btn btn-secondary">View Your Requests</a>
+    </div>
+  </div>
+
+{% endblock %}
